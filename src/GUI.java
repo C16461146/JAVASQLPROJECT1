@@ -1,7 +1,12 @@
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableModel;
+import java.awt.event.*;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -12,10 +17,12 @@ public class GUI {
     private JTabbedPane tabbedPane1;
     private JPanel panel1;
     private JComboBox comboBox1;
-    private JTable table1;
+    private JTable table1,table2;
     private JLabel welcome;
+    private JScrollPane scoller2;
+    private JFrame frameGlobal;
     public static boolean loggedIn=false;
-    DefaultTableModel tableModel ;
+    DefaultTableModel tableModel,tableModel2 ;
 
 
 
@@ -70,12 +77,54 @@ public class GUI {
         table1=new JTable();
         //table1.setModel(tableModel);
         welcome=new JLabel("test");
-        table1.setDefaultEditor(Object.class, null);
 
+        table1.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode()==KeyEvent.VK_ENTER){
+
+                    int row = table1.getSelectedRow();
+                    int column = table1.getSelectedColumn();
+
+                    System.out.println("COLUMN >>> "+column);
+
+                    String updatedCellValue = table1.getValueAt(row,column).toString();
+
+
+
+                    System.out.println("Row >>> "+row);
+
+                    updateDisplay(updatedCellValue,row,column);
+
+                }
+            }
+        });
+       // table1.setDefaultEditor(Object.class, null);
 
     }
-    public void displayQuery(String selectedItem,ResultSet rs) throws SQLException {
+    public void updateDisplay(String updatedCellValue,int row, int column){
+        String sSQL = "";
+        if (column==1){=
+            sSQL = "UPDATE `components` SET `Name` = ("+updatedCellValue+") WHERE ("+row+") = row";
+        }
+        if (column==2){
+            sSQL =   "UPDATE components SET Model Number=? WHERE ID=("+updatedCellValue+")" ;
+        }
+        if (column==3){
+            sSQL =   "UPDATE components SET Price=? WHERE ID=("+updatedCellValue+")" ;
+        }
+        if (column==4){
+            sSQL =   "UPDATE components SET Quantity=? WHERE ID=("+updatedCellValue+")" ;
+        }
+        if (column==5){
+            sSQL =   "UPDATE components SET Type=? WHERE ID=("+updatedCellValue+")" ;
+        }
+        System.out.println("Column Number "+column);
+        db.updateDatabase(updatedCellValue,sSQL,column);
+    }
 
+
+    public void displayQuery(String selectedItem,ResultSet rs) throws SQLException {
         System.out.println(""+selectedItem);
 
         Object[] values = new Object[5];
@@ -85,8 +134,6 @@ public class GUI {
         {
             tableModel.removeRow(0);
         }
-
-
         while (rs.next()) {
             values = new Object[5];
             values[0] = rs.getString(1);
@@ -96,14 +143,10 @@ public class GUI {
             values[4] = rs.getString(5);
 
             tableModel.addRow(values);
-
-
             }
-
-        table1.setModel(tableModel);
+              table1.setModel(tableModel);
 
             // clear table if dropdown is changed with existing data
-
           /*  if(changed = true){
                 tableModel.setRowCount(0);
                 tableModel.addRow(values.);
@@ -118,17 +161,12 @@ public class GUI {
 
 
 
-//For commit asdasdsaddasdsd
-
-
+    //For commit asdasdsaddasdsd
     public static void showUI(ResultSet rs){
 
         try {
             rs.next();
-            //welcome.setText("Welcome, "+rs.getString(1));
-            //System.out.println("name: " +welcome.getText());
-            //welcome.repaint();
-            //welcome.revalidate();
+
             if(rs.getString(2).equals("Yes")){
                 //if manager
             }
