@@ -86,15 +86,20 @@ public class GUI {
                     int row = table1.getSelectedRow();
                     int column = table1.getSelectedColumn();
 
+                    String[] columnName = {"Name", "Model Number", "Price", "Quantity", "Type"};
+
                     System.out.println("COLUMN >>> "+column);
 
                     String updatedCellValue = table1.getValueAt(row,column).toString();
+                    String sSQL = "UPDATE components SET `"+columnName[column]+"`='"+updatedCellValue+"' WHERE ";
 
-
-
-                    System.out.println("Row >>> "+row);
-
-                    updateDisplay(updatedCellValue,row,column);
+                    for(int x=0;x<table1.getColumnCount();x++){
+                        if(x!=column){
+                            sSQL+="`"+columnName[x]+"`='"+table1.getValueAt(row,x).toString()+"' AND ";
+                        }
+                    }
+                    sSQL+="1=1";
+                    db.updateDatabase(sSQL);
 
                 }
             }
@@ -104,7 +109,7 @@ public class GUI {
     }
     public void updateDisplay(String updatedCellValue,int row, int column){
         String sSQL = "";
-        if (column==1){=
+        if (column==1){
             sSQL = "UPDATE `components` SET `Name` = ("+updatedCellValue+") WHERE ("+row+") = row";
         }
         if (column==2){
@@ -120,7 +125,7 @@ public class GUI {
             sSQL =   "UPDATE components SET Type=? WHERE ID=("+updatedCellValue+")" ;
         }
         System.out.println("Column Number "+column);
-        db.updateDatabase(updatedCellValue,sSQL,column);
+        db.updateDatabase(sSQL);
     }
 
 

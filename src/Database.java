@@ -51,18 +51,18 @@ public class Database{
             return null;
         }
     }
-    public static ResultSet updateDatabase(String updatedCellValue,String sSQL, int column){
+    public static ResultSet updateDatabase(String sSQL){
         try {
             //str="SELECT * FROM `components` WHERE `type`='"+str+"'";
 
-            System.out.println("Updated Cell Value " + updatedCellValue);
+            System.out.println("Updated Cell Value " + sSQL);
 
             Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/pc shop?user=root&password=");
 
             Statement statement = connection.createStatement();
 
-            ResultSet rs = statement.executeQuery(updatedCellValue);
-            // statement.executeQuery(str);
+            ResultSet rs = statement.executeQuery(sSQL);
+            statement.executeQuery(sSQL);
             return rs;
         } catch (SQLException ex) {
             // handle any errors
