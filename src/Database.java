@@ -1,24 +1,22 @@
-//package com.company;
 import java.sql.*;
 
 public class Database{
-    public static ResultSet checkLogin(String str){
+    static String url="jdbc:mariadb://localhost:3306/pc shop?user=root&password=";  //db address
+    public static ResultSet checkLogin(String sql){                                 //login check
         try {
-            System.out.println("sql : " + str);
-            Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/pc shop?user=root&password=");
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(str);
-            if (rs.next()){
-                System.out.println("rs : " + rs.getString(1));
-                str="SELECT `name`, `manager status` FROM `employees` WHERE `ppsn` = '"+rs.getString(1)+"'";
-                rs=statement.executeQuery(str);
-                connection.close();
-                return rs;
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            ResultSet rs = statement.executeQuery(sql);                             //executes sql query
+            if (rs.next()){                                                         //if login matches
+                sql="SELECT `name`, `manager status` FROM `employees` WHERE `ppsn` = '"+rs.getString(1)+"'";//sql statement
+                rs=statement.executeQuery(sql);                                     //executes sql query
+                connection.close();                                                 //closes connection
+                return rs;                                                          //returns sql result set
             }
             else {
-                return null;
+                return null;                                                        //if login doesn't match return null
             }
-        } catch (SQLException ex) {
+        } catch (SQLException ex) {                                                 //exception handling
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
@@ -28,42 +26,41 @@ public class Database{
     public static ResultSet getComponent(String str){
         try {
             str="SELECT * FROM `components` WHERE `type`='"+str+"'";
-            Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/pc shop?user=root&password=");
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(str);
-            return rs;
-        } catch (SQLException ex) {
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            ResultSet rs = statement.executeQuery(str);                             //executes sql query
+            return rs;                                                              //returns sql result set
+        } catch (SQLException ex) {                                                 //exception handling
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
             return null;
         }
     }
-    public static ResultSet updateDatabase(String sSQL){
+    public static boolean updateDatabase(String sql){
         try {
-            System.out.println("Updated Cell Value " + sSQL);
-            Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/pc shop?user=root&password=");
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(sSQL);
-            return rs;
-        } catch (SQLException ex) {
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            ResultSet rs = statement.executeQuery(sql);                             //executes sql query
+            return true;                                                              //returns sql result set
+        } catch (SQLException ex) {                                                 //exception handling
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
-            return null;
+            return false;
         }
     }
-    public static boolean isDuplicate(String sql){
+    public static boolean isDuplicate(String sql){                                  //checks for duplicates
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/pc shop?user=root&password=");
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(sql);
-            if (rs.next()){
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            ResultSet rs = statement.executeQuery(sql);                             //executes sql query
+            if (rs.next()){                                                         //if duplicate found returns true, otherwise false
                 return true;
             } else {
                 return false;
             }
-        } catch (SQLException ex) {
+        } catch (SQLException ex) {                                                 //exception handling
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
@@ -72,11 +69,11 @@ public class Database{
     }
     public static boolean insert(String sql){
         try {
-            Connection connection = DriverManager.getConnection("jdbc:mariadb://localhost:3306/pc shop?user=root&password=");
-            Statement statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(sql);
-            return true;
-        } catch (SQLException ex) {
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            statement.executeQuery(sql);                                            //executes sql query
+            return true;                                                            //returns true if successful
+        } catch (SQLException ex) {                                                 //exception handling
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
