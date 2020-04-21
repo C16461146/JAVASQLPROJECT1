@@ -44,15 +44,28 @@ public class GUI{
     private JLabel successLabel;
     private JLabel errorLabel;
     private JLabel invSuccess;
-    DefaultTableModel tableModel;
+    private JTextField nameFieldCust;
+    private JTextField surnameFieldCust;
+    private JTextField numberFieldCust;
+    private JTable customerInfoTable;
+    private JButton saveCustomerButton;
+    private JLabel nameErrorMsg;
+    private JLabel surnameErrorMsg;
+    private JLabel numberErrorMsg;
+    private JLabel successMsg;
+    private JLabel allFieldsErrorMsg;
+    DefaultTableModel tableModel,tableModel2;
     private static boolean managerStatus=false;
+
 
     public void createUIComponents() {
         String[] partList = {"CPU", "GPU", "MotherBoard", "Storage", "PSU"};
         String[] columnNames = {"Name", "Model Number", "Price", "Quantity", "Type"};
         String[][] data = {{"Name", "Model", "Price", "Quantity", "Type"}};
-        //tabbedPane = new JTabbedPane();
-        //tabbedPane1.setEnabledAt(2,false);//returns out of bound error???
+
+        String [][] customerData = {{"ID","Name","Surname","Phone"}};
+        String[] customerColumnNames = {"ID","Name", "Surname", "Phone Number"};
+
 
 
         //***************
@@ -233,8 +246,100 @@ public class GUI{
                 }
             });
         }
-    }
+        //***************
+        //4th tab code
+        customerInfoTable = new JTable();
+        tableModel2 = new DefaultTableModel(customerData,customerColumnNames);
+        displayCustomerTable();
 
+        saveCustomerButton = new JButton();
+        saveCustomerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //disable errors + success message
+                successLabel.setVisible(false);
+                nameErrorMsg.setVisible(false);
+                numberErrorMsg.setVisible(false);
+                surnameErrorMsg.setVisible(false);
+                allFieldsErrorMsg.setVisible(false);
+
+                //Parse values
+                String nameTextValue = nameFieldCust.getText();
+                String surnameTextValue = surnameFieldCust.getText();
+                String numberTextValue = numberFieldCust.getText();
+
+                System.out.println("data>>> " + nameTextValue);
+                System.out.println("data>>> " + surnameTextValue);
+                System.out.println("data>>> " + numberTextValue);
+
+                boolean error=false;
+
+                if(nameTextValue.length()==0||surnameTextValue.length()==0||numberTextValue.length()==0){//empty field check
+                    allFieldsErrorMsg.setVisible(true);           //displays error
+                    error=true;
+                }
+
+                if(!numberTextValue.matches("[0-9]+")){     //checks if values contain numbers only
+                    numberErrorMsg.setVisible(true);              //displays error
+                    error=true;
+                }
+                if(!nameTextValue.matches("[a-zA-Z]+")){      //checks if values contain letters only
+                    nameErrorMsg.setVisible(true);                //displays error
+                    error=true;
+                }
+                if(!surnameTextValue.matches("[a-zA-Z]+")){     //checks if values contain letters only
+                    surnameErrorMsg.setVisible(true);             //displays error
+                    error=true;
+                }
+
+
+                if(!error){//if form is correct
+                    //sql statements
+                    String sql="INSERT INTO `customers` (`name`, `surname`, `phone`) VALUES ('"+nameTextValue+"',  '"+surnameTextValue+"',  '"+numberTextValue+"')";
+
+                    if(db.insert(sql)){       //executes both sql statements and checks if they were successful
+                        successMsg.setVisible(true);         //displays success message
+                        refreshCustomerTable();
+                    }
+                }
+            }
+        });
+
+
+
+    }
+    //display customer information table in Customer tab
+    public void displayCustomerTable(){
+        try {
+            ResultSet rs = db.getCustomerData();
+            Object[] values = new Object[4];
+
+            while (tableModel2.getRowCount() > 0) {          //removes old table
+                tableModel2.removeRow(0);
+            }
+            while (rs.next()) {                             //parses new values
+                values = new Object[4];
+                values[0] = rs.getString(1);
+                values[1] = rs.getString(2);
+                values[2] = rs.getString(3);
+                values[3] = rs.getString(4);
+
+                tableModel2.addRow(values);                  //adds new values to the table
+            }
+            customerInfoTable.setModel(tableModel2);
+        } catch (SQLException ex) {                                                 //exception handling
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+
+    }
+    public void refreshCustomerTable(){
+        while (tableModel2.getRowCount() > 0) {          //removes old table
+            tableModel2.removeRow(0);
+        }
+        displayCustomerTable();
+    }
 
 
     public void displayQuery(String selectedItem){
