@@ -94,4 +94,32 @@ public class Database{
             return null;
         }
     }
+    public static ResultSet getPurchasesData(){
+        try {
+            String str="SELECT * FROM `purchases` ";
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            ResultSet rs = statement.executeQuery(str);                             //executes sql query
+            return rs;                                                              //returns sql result set
+        } catch (SQLException ex) {                                                 //exception handling
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+            return null;
+        }
+    }
+    public static ResultSet getSpecificPurchasesData(String customerSelected){
+        try {
+            String str="SELECT * FROM `purchases` WHERE `FK_customerID`='"+customerSelected+"'";
+            Connection connection = DriverManager.getConnection(url);               //connect to the database
+            Statement statement = connection.createStatement();                     //creates an sql statement
+            ResultSet rs = statement.executeQuery(str);                             //executes sql query
+            return rs;                                                              //returns sql result set
+        } catch (SQLException ex) {                                                 //exception handling
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+            return null;
+        }
+    }
 }

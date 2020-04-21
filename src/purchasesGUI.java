@@ -10,14 +10,11 @@ public class purchasesGUI extends JFrame{
       private JPanel purchasesPanel;
       DefaultTableModel tableModel;
 
-
-
-
     public void displayPurchaseWindow() {
 
         JFrame frame = new JFrame("Purchases");
 
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         frame.setContentPane(new purchasesGUI().purchasesPanel);
         //Display the window.
         frame.pack();

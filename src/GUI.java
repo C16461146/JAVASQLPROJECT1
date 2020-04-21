@@ -6,6 +6,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Random;
 
+import static java.lang.Integer.parseInt;
+
 public class GUI{
     Database db = new Database();
     private JPanel mainPanel;
@@ -54,8 +56,12 @@ public class GUI{
     private JLabel numberErrorMsg;
     private JLabel successMsg;
     private JLabel allFieldsErrorMsg;
-    DefaultTableModel tableModel,tableModel2;
+    private JTable customerPurchasesTable;
+    private JComboBox selectCustomerPurchases;
+    DefaultTableModel tableModel,tableModel2,tableModel3;
     private static boolean managerStatus=false;
+
+
 
 
     public void createUIComponents() {
@@ -65,6 +71,9 @@ public class GUI{
 
         String [][] customerData = {{"ID","Name","Surname","Phone"}};
         String[] customerColumnNames = {"ID","Name", "Surname", "Phone Number"};
+
+        String [][] purchasesData = {{"PurchaseID","CustomerID","PurchaseAmount","RefundStatus"}};
+        String[] purchasesColumnNames = {"PurchaseID","CustomerID", "PurchaseAmount", "RefundStatus"};
 
 
 
@@ -323,21 +332,75 @@ public class GUI{
             }
         });
 
+        //***************
+        //5th tab code Purchases
+        customerPurchasesTable = new JTable();
+        tableModel3 = new DefaultTableModel(purchasesData,purchasesColumnNames);
+
+
+        db.getPurchasesData();
+
+
+        selectCustomerPurchases = new JComboBox();
+        fillCustomersCombo();
+        displayPurchasesTable();
+
+        selectCustomerPurchases.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String customerSelected = (String) selectCustomerPurchases.getSelectedItem();
+
+
+                String customerID = String.valueOf(customerSelected.charAt(customerSelected.length() - 1));
+                System.out.println("CUST ID>>>> " + customerID);
+
+                displaySpecificPurchases(customerID);
+            }
+        });
+
+
+
 
 
     }
+
+
+
     public void displayPurchasesMenu(){
         purchasesGUI purGui = new purchasesGUI();
         purGui.displayPurchaseWindow();
 
     }
 
+    public void displaySpecificPurchases(String customerSelected){
+        try{
+            ResultSet rs = db.getSpecificPurchasesData(customerSelected);
 
+            Object[] values = new Object[4];
 
+            while (tableModel3.getRowCount() > 0) {          //removes old table
+                tableModel3.removeRow(0);
+            }
+            while (rs.next()) {                             //parses new values
+                values = new Object[4];
+                values[0] = rs.getString(1);
+                values[1] = rs.getString(2);
+                values[2] = rs.getString(3);
+                values[3] = rs.getString(4);
+
+                tableModel3.addRow(values);                  //adds new values to the table
+            }
+            customerPurchasesTable.setModel(tableModel3);
+        } catch (SQLException ex) {                                                 //exception handling
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+
+    }
 
     //display customer information table in Customer tab
     public void displayCustomerTable(){
-
         try {
             ResultSet rs = db.getCustomerData();
             Object[] values = new Object[4];
@@ -367,6 +430,68 @@ public class GUI{
             tableModel2.removeRow(0);
         }
         displayCustomerTable();
+    }
+    public void fillCustomersCombo(){
+        String displayFullNameAndPhone = "";
+        try{
+            ResultSet rs = db.getCustomerData();
+
+            Object[] values = new Object[4];
+
+           while(rs.next()) {
+               //parses new values
+                values = new Object[4];
+
+                values[0] = rs.getString("CustomerID");
+                values[1] = rs.getString("Name");
+                values[2] = rs.getString("Surname");
+                values[3] = rs.getString("Phone");
+
+                 String custID,name,surname,phone = "";
+                 custID = values[0].toString();
+                 name = values[1].toString();
+                 surname = values[2].toString();
+                 phone = values[3].toString();
+                 displayFullNameAndPhone = name + "  " + surname + "- Phone Number " + phone + " - Customer ID = " + custID;
+                 Object namesForComboBox = displayFullNameAndPhone;
+
+                //adds name values to the combobox
+                selectCustomerPurchases.addItem(namesForComboBox);
+
+            }
+
+        } catch (SQLException ex) {                                                 //exception handling
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+
+    }
+    public void displayPurchasesTable(){
+        try{
+            ResultSet rs = db.getPurchasesData();
+
+            Object[] values = new Object[4];
+
+            while (tableModel3.getRowCount() > 0) {          //removes old table
+                tableModel3.removeRow(0);
+            }
+            while (rs.next()) {                             //parses new values
+                values = new Object[4];
+                values[0] = rs.getString(1);
+                values[1] = rs.getString(2);
+                values[2] = rs.getString(3);
+                values[3] = rs.getString(4);
+
+                tableModel3.addRow(values);                  //adds new values to the table
+            }
+            customerPurchasesTable.setModel(tableModel3);
+        } catch (SQLException ex) {                                                 //exception handling
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+
     }
     public void displayQuery(String selectedItem){
         try {
