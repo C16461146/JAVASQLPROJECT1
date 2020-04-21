@@ -114,6 +114,27 @@ public class GUI{
         });
         displayQuery(partList[0]);                                          //displays table for the first item
 
+        //Popup Menu for Components Table
+        JPopupMenu popupMenu = new JPopupMenu();
+        JMenuItem purchaseItem = new JMenuItem("Purchase");
+
+        popupMenu.add(purchaseItem);
+        componentTable.setComponentPopupMenu(popupMenu);
+
+
+        purchaseItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                displayPurchasesMenu();
+            }
+        });
+
+
+
+
+
+
+
         //**********************
         //2nd tab code
         addComponentSelector = new JComboBox(partList);
@@ -268,9 +289,6 @@ public class GUI{
                 String surnameTextValue = surnameFieldCust.getText();
                 String numberTextValue = numberFieldCust.getText();
 
-                System.out.println("data>>> " + nameTextValue);
-                System.out.println("data>>> " + surnameTextValue);
-                System.out.println("data>>> " + numberTextValue);
 
                 boolean error=false;
 
@@ -308,8 +326,18 @@ public class GUI{
 
 
     }
+    public void displayPurchasesMenu(){
+        purchasesGUI purGui = new purchasesGUI();
+        purGui.displayPurchaseWindow();
+
+    }
+
+
+
+
     //display customer information table in Customer tab
     public void displayCustomerTable(){
+
         try {
             ResultSet rs = db.getCustomerData();
             Object[] values = new Object[4];
@@ -340,8 +368,6 @@ public class GUI{
         }
         displayCustomerTable();
     }
-
-
     public void displayQuery(String selectedItem){
         try {
             ResultSet rs = db.getComponent(selectedItem);   //gets the sql data from the selected item and stores it into rs
@@ -394,5 +420,6 @@ public class GUI{
         Login login = new Login();
         Login.createAndShowGUI();
     }
+
 
 }
