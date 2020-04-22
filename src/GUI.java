@@ -134,7 +134,12 @@ public class GUI{
         purchaseItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                displayPurchasesMenu();
+                int row = componentTable.getSelectedRow(); //row selected
+                int column = 2; //price entry on table
+                Object cellValue = componentTable.getValueAt(row,column);
+                String purchaseAmount = String.valueOf(cellValue);
+
+                displayPurchasesMenu(purchaseAmount);
             }
         });
 
@@ -324,7 +329,7 @@ public class GUI{
                     //sql statements
                     String sql="INSERT INTO `customers` (`name`, `surname`, `phone`) VALUES ('"+nameTextValue+"',  '"+surnameTextValue+"',  '"+numberTextValue+"')";
 
-                    if(db.insert(sql)){       //executes both sql statements and checks if they were successful
+                    if(db.insert(sql)){       //executes  sql statement and checks if they were successful
                         successMsg.setVisible(true);         //displays success message
                         refreshCustomerTable();
                     }
@@ -336,10 +341,7 @@ public class GUI{
         //5th tab code Purchases
         customerPurchasesTable = new JTable();
         tableModel3 = new DefaultTableModel(purchasesData,purchasesColumnNames);
-
-
         db.getPurchasesData();
-
 
         selectCustomerPurchases = new JComboBox();
         fillCustomersCombo();
@@ -349,10 +351,7 @@ public class GUI{
             @Override
             public void actionPerformed(ActionEvent e) {
                 String customerSelected = (String) selectCustomerPurchases.getSelectedItem();
-
-
                 String customerID = String.valueOf(customerSelected.charAt(customerSelected.length() - 1));
-                System.out.println("CUST ID>>>> " + customerID);
 
                 displaySpecificPurchases(customerID);
             }
@@ -366,9 +365,10 @@ public class GUI{
 
 
 
-    public void displayPurchasesMenu(){
-        purchasesGUI purGui = new purchasesGUI();
-        purGui.displayPurchaseWindow();
+    public void displayPurchasesMenu(String purchaseAmount){
+        purchasesGUI purGui = new purchasesGUI(purchaseAmount);
+
+        purGui.displayPurchaseWindow(purchaseAmount);
 
     }
 
@@ -452,7 +452,7 @@ public class GUI{
                  name = values[1].toString();
                  surname = values[2].toString();
                  phone = values[3].toString();
-                 displayFullNameAndPhone = name + "  " + surname + "- Phone Number " + phone + " - Customer ID = " + custID;
+                 displayFullNameAndPhone = name + "  " + surname + "- Phone Number " + phone + " - ID = " + custID;
                  Object namesForComboBox = displayFullNameAndPhone;
 
                 //adds name values to the combobox

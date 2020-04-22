@@ -248,7 +248,7 @@
             </constraints>
             <properties>
               <enabled value="false"/>
-              <visible value="false"/>
+              <visible value="true"/>
             </properties>
             <border type="none"/>
             <children>

@@ -110,7 +110,7 @@ public class Database{
     }
     public static ResultSet getSpecificPurchasesData(String customerSelected){
         try {
-            String str="SELECT * FROM `purchases` WHERE `FK_customerID`='"+customerSelected+"'";
+            String str="SELECT * FROM `purchases` WHERE `CustomerID`='"+customerSelected+"'";
             Connection connection = DriverManager.getConnection(url);               //connect to the database
             Statement statement = connection.createStatement();                     //creates an sql statement
             ResultSet rs = statement.executeQuery(str);                             //executes sql query

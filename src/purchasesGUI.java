@@ -1,5 +1,9 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -8,18 +12,31 @@ public class purchasesGUI extends JFrame{
       Database db = new Database();
       private JTable customersInfo;
       private JPanel purchasesPanel;
-      DefaultTableModel tableModel;
+      private JButton saveToPurchasesButton;
+    private JLabel successPurchaseMsg;
+    private JLabel Customers;
+    private JLabel errorPurchaseMsg;
+    DefaultTableModel tableModel;
+      String purchaseAmountGlobal;
 
-    public void displayPurchaseWindow() {
+      public purchasesGUI(String purchaseFromGuiClass){
 
-        JFrame frame = new JFrame("Purchases");
+          purchaseAmountGlobal = purchaseFromGuiClass;
 
+    }
+
+
+    public void displayPurchaseWindow(String purchaseAmount) {
+
+        JFrame frame = new JFrame("Add to Purchases");
+        createUIComponents();
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-        frame.setContentPane(new purchasesGUI().purchasesPanel);
+        frame.setContentPane(new purchasesGUI(purchaseAmount).purchasesPanel);
         //Display the window.
         frame.pack();
         frame.setVisible(true);
-
+        purchaseAmountGlobal = purchaseAmount;
+        System.out.println("global amount> "+purchaseAmount);
 
     }
     public void displayCustomerTable(){
@@ -67,5 +84,37 @@ public class purchasesGUI extends JFrame{
     private void createUIComponents() {
         // TODO: place custom component creation code here
         displayCustomerTable();
+
+        saveToPurchasesButton = new JButton();
+        saveToPurchasesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+
+                int row = customersInfo.getSelectedRow();
+                int column = 0;
+
+                Object customerID = customersInfo.getValueAt(row,column);
+                System.out.println("amountttt>>>" +purchaseAmountGlobal);
+                System.out.println("customer ID>>> " +customerID);
+
+
+               String sql = "INSERT INTO `purchases` (`customerID`,  `PurchaseAmount`, `RefundStatus`) VALUES ('"+customerID+"', '"+purchaseAmountGlobal+"','No')";
+
+              //  String sql = "INSERT INTO `purchases` (`customerID`,  `PurchaseAmount`, `RefundStatus`) VALUES ('"+customerID+"', 'TEST','No')";
+
+
+                db.insert(sql);
+
+                if(db.insert(sql)){       //executes  sql statement and checks if they were successful
+                    successPurchaseMsg.setVisible(true);         //displays success message
+                }
+                else
+                {
+                    errorPurchaseMsg.setVisible(true);
+                }
+            }
+        });
+
     }
 }
