@@ -1,5 +1,6 @@
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.text.DateFormat;
@@ -58,11 +59,15 @@ public class GUI{
     private JLabel allFieldsErrorMsg;
     private JTable customerPurchasesTable;
     private JComboBox selectCustomerPurchases;
+    private JButton refundButton;
+    private JButton unprocessRefundButton;
     DefaultTableModel tableModel,tableModel2,tableModel3;
     private static boolean managerStatus=false;
 
 
+    public GUI() {
 
+    }
 
     public void createUIComponents() {
         String[] partList = {"CPU", "GPU", "MotherBoard", "Storage", "PSU"};
@@ -73,7 +78,7 @@ public class GUI{
         String[] customerColumnNames = {"ID","Name", "Surname", "Phone Number"};
 
         String [][] purchasesData = {{"PurchaseID","CustomerID","PurchaseAmount","RefundStatus"}};
-        String[] purchasesColumnNames = {"PurchaseID","CustomerID", "PurchaseAmount", "RefundStatus"};
+        String[] purchasesColumnNames = {"CustomerID","PurchaseID", "PurchaseAmount", "RefundStatus"};
 
 
 
@@ -87,6 +92,7 @@ public class GUI{
                 displayQuery(selectedItem);                         //call function to draw table
             }
         });
+
 
         componentTable = new JTable();
         componentTable.addKeyListener(new KeyAdapter() {
@@ -358,6 +364,61 @@ public class GUI{
         });
 
 
+        refundButton = new JButton();
+        refundButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                System.out.println("selected row "+ customerPurchasesTable.getSelectedRow());
+                int row = customerPurchasesTable.getSelectedRow();
+                int column = 3;
+
+                Object refundStatus = customerPurchasesTable.getValueAt(row,column);
+                System.out.println("refund status "+refundStatus);
+                String purchaseID;
+
+
+                purchaseID = (String) customerPurchasesTable.getValueAt(row,1);
+
+
+               if(!(refundStatus.toString() == "Yes")) {
+                   System.out.println("Executing if statement");
+                   String sql = "UPDATE `purchases` SET `RefundStatus` = 'Yes' WHERE `purchases`.`purchaseID` = '"+purchaseID+"'";
+                   db.updateDatabase(sql);
+                   refreshPurchasesTable();
+
+               }
+
+            }
+        });
+
+        unprocessRefundButton = new JButton();
+        unprocessRefundButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+
+                System.out.println("selected row "+ customerPurchasesTable.getSelectedRow());
+                int row = customerPurchasesTable.getSelectedRow();
+                int column = 3;
+
+                Object refundStatus = customerPurchasesTable.getValueAt(row,column);
+                System.out.println("refund status "+refundStatus);
+                String purchaseID;
+
+                purchaseID = (String) customerPurchasesTable.getValueAt(row,1);
+
+
+                if(!(refundStatus.toString() == "No")) {
+                    System.out.println("Executing if statement");
+                    String sql = "UPDATE `purchases` SET `RefundStatus` = 'No' WHERE `purchases`.`purchaseID` = '"+purchaseID+"'";
+                    db.updateDatabase(sql);
+                    refreshPurchasesTable();
+
+                }
+
+            }
+        });
+
 
 
 
@@ -431,6 +492,12 @@ public class GUI{
         }
         displayCustomerTable();
     }
+    public void refreshPurchasesTable(){
+        while (tableModel3.getRowCount() > 0) {          //removes old table
+            tableModel3.removeRow(0);
+        }
+        displayPurchasesTable();
+    }
     public void fillCustomersCombo(){
         String displayFullNameAndPhone = "";
         try{
@@ -483,8 +550,10 @@ public class GUI{
                 values[2] = rs.getString(3);
                 values[3] = rs.getString(4);
 
-                tableModel3.addRow(values);                  //adds new values to the table
+                tableModel3.addRow(values);//adds new values to the table
+
             }
+
             customerPurchasesTable.setModel(tableModel3);
         } catch (SQLException ex) {                                                 //exception handling
             System.out.println("SQLException: " + ex.getMessage());
