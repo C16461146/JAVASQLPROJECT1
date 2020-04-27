@@ -61,11 +61,13 @@ public class GUI{
     private JComboBox selectCustomerPurchases;
     private JButton refundButton;
     private JButton unprocessRefundButton;
+    private JButton removeFromInventoryButton;
     DefaultTableModel tableModel,tableModel2,tableModel3;
     private static boolean managerStatus=false;
 
 
     public GUI() {
+
 
     }
 
@@ -149,7 +151,23 @@ public class GUI{
             }
         });
 
+        removeFromInventoryButton = new JButton();
+        removeFromInventoryButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                int row = componentTable.getSelectedRow();
+                //name of product
+                int column = 0;
+                Object prodName = componentTable.getValueAt(row,column);
+                String collectedData = prodName.toString();
+                System.out.println("collectedData " + collectedData);
+                String sql = " DELETE FROM `components` WHERE `Name` = '"+collectedData+"' ";
+                db.updateDatabase(sql);
+                String selectedItem = componentSelector.getSelectedItem().toString();
+                refreshInventoryTable(selectedItem);
 
+            }
+        });
 
 
 
@@ -412,7 +430,7 @@ public class GUI{
                     System.out.println("Executing if statement");
                     String sql = "UPDATE `purchases` SET `RefundStatus` = 'No' WHERE `purchases`.`purchaseID` = '"+purchaseID+"'";
                     db.updateDatabase(sql);
-                    refreshPurchasesTable();
+
 
                 }
 
@@ -586,6 +604,12 @@ public class GUI{
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
         }
+    }
+    public void refreshInventoryTable(String selectedItem){
+        while (tableModel.getRowCount() > 0) {          //removes old table
+            tableModel.removeRow(0);
+        }
+        displayQuery(selectedItem);
     }
 
     //draws the UI
