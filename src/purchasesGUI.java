@@ -8,26 +8,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class purchasesGUI extends JFrame{
-
-      Database db = new Database();
-      private JTable customersInfo;
-      private JPanel purchasesPanel;
-      private JButton saveToPurchasesButton;
+    Database db = new Database();
+    private JTable customersInfo;
+    private JPanel purchasesPanel;
+    private JButton saveToPurchasesButton;
     private JLabel successPurchaseMsg;
     private JLabel Customers;
     private JLabel errorPurchaseMsg;
     DefaultTableModel tableModel;
-      String purchaseAmountGlobal;
+    String purchaseAmountGlobal;
 
-      public purchasesGUI(String purchaseFromGuiClass){
-
-          purchaseAmountGlobal = purchaseFromGuiClass;
-
+    public purchasesGUI(String purchaseFromGuiClass){
+        purchaseAmountGlobal = purchaseFromGuiClass;
     }
 
-
     public void displayPurchaseWindow(String purchaseAmount) {
-
         JFrame frame = new JFrame("Add to Purchases");
         createUIComponents();
         frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
@@ -36,19 +31,14 @@ public class purchasesGUI extends JFrame{
         frame.pack();
         frame.setVisible(true);
         purchaseAmountGlobal = purchaseAmount;
-        System.out.println("global amount> "+purchaseAmount);
-
     }
+
     public void displayCustomerTable(){
         String [][] customerData = {{"ID","Name","Surname","Phone"}};
         String[] customerColumnNames = {"ID","Name", "Surname", "Phone Number"};
 
         customersInfo = new JTable();
         tableModel = new DefaultTableModel(customerData,customerColumnNames);
-
-        System.out.println("TEST");
-
-        System.out.println("ROW COUNT>>> "+tableModel.getRowCount());
         ResultSet rs = db.getCustomerData();
 
         try {
@@ -63,13 +53,6 @@ public class purchasesGUI extends JFrame{
                 values[1] = rs.getString(2);
                 values[2] = rs.getString(3);
                 values[3] = rs.getString(4);
-
-                System.out.println("data>>> "+ values[0]);
-                System.out.println("data>>> " +values[1]);
-                System.out.println("data>>> " +values[2]);
-                System.out.println("data>>> " +values[3]);
-
-
                 tableModel.addRow(values);                  //adds new values to the table
             }
             customersInfo.setModel(tableModel);
@@ -84,37 +67,23 @@ public class purchasesGUI extends JFrame{
     private void createUIComponents() {
         // TODO: place custom component creation code here
         displayCustomerTable();
-
         saveToPurchasesButton = new JButton();
         saveToPurchasesButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
-
-
                 int row = customersInfo.getSelectedRow();
                 int column = 0;
 
                 Object customerID = customersInfo.getValueAt(row,column);
-                System.out.println("amountttt>>>" +purchaseAmountGlobal);
-                System.out.println("customer ID>>> " +customerID);
 
-
-               String sql = "INSERT INTO `purchases` (`customerID`,  `PurchaseAmount`, `RefundStatus`) VALUES ('"+customerID+"', '"+purchaseAmountGlobal+"','No')";
-
-              //  String sql = "INSERT INTO `purchases` (`customerID`,  `PurchaseAmount`, `RefundStatus`) VALUES ('"+customerID+"', 'TEST','No')";
-
-
-                db.insert(sql);
+                String sql = "INSERT INTO `purchases` (`customerID`,  `PurchaseAmount`, `RefundStatus`) VALUES ('"+customerID+"', '"+purchaseAmountGlobal+"','No')";
 
                 if(db.insert(sql)){       //executes  sql statement and checks if they were successful
                     successPurchaseMsg.setVisible(true);         //displays success message
-                }
-                else
-                {
+                } else {
                     errorPurchaseMsg.setVisible(true);
                 }
             }
         });
-
     }
 }
