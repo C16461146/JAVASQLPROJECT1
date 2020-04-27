@@ -71,8 +71,8 @@ public class GUI{
 
     public void createUIComponents() {
         String[] partList = {"CPU", "GPU", "MotherBoard", "Storage", "PSU"};
-        String[] columnNames = {"Name", "Model Number", "Price", "Quantity", "Type"};
-        String[][] data = {{"Name", "Model", "Price", "Quantity", "Type"}};
+        String[] columnNames = {"Name", "Model Number", "Price", "Quantity", "Supplier", "Type"};
+        String[][] data = {{"Name", "Model", "Price", "Quantity", "Supplier", "Type"}};
 
         String [][] customerData = {{"ID","Name","Surname","Phone"}};
         String[] customerColumnNames = {"ID","Name", "Surname", "Phone Number"};
@@ -418,10 +418,6 @@ public class GUI{
 
             }
         });
-
-
-
-
     }
 
 
@@ -571,12 +567,13 @@ public class GUI{
                 tableModel.removeRow(0);
             }
             while (rs.next()) {                             //parses new values
-                values = new Object[5];
+                values = new Object[6];
                 values[0] = rs.getString(1);
                 values[1] = rs.getString(2);
                 values[2] = rs.getString(3);
                 values[3] = rs.getString(4);
                 values[4] = rs.getString(5);
+                values[5] = rs.getString(6);
 
                 tableModel.addRow(values);                  //adds new values to the table
             }
